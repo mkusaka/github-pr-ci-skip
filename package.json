@@ -1,0 +1,19 @@
+{
+  "devDependencies": {
+    "@types/chrome": "^0.0.181",
+    "esbuild": "^0.14.36",
+    "prettier": "^2.6.2",
+    "typescript": "^4.6.3"
+  },
+  "name": "github-pr-ci-skip",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/mkusaka/github-pr-ci-skip.git",
+  "author": "mkusaka <hinoshita1992@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "esbuild content.ts --bundle --target=chrome100 --minify --outfile=content.js",
+    "watch": "esbuild content.ts --bundle --target=chrome100 --watch --outfile=content.js",
+    "package": "rm -f pacakge.zip && yarn build && zip -r package.zip . -x '.git/**' './node_modules/**' 'yarn*' '*.ts' '.idea/**' 'tsconfig.json' 'package.json' '.gitignore'"
+  }
+}

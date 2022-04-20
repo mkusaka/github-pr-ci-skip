@@ -1,0 +1,13 @@
+{
+  "name": "github-pr-ci-skip",
+  "version": "0.1",
+  "description": "Adds ci skip to PR title as default.",
+  "manifest_version": 3,
+  "content_scripts": [{
+    "matches": ["https://github.com/*/pull/*"],
+    "js": ["content.js"]
+  }],
+  "host_permissions": [
+    "https://github.com/*/pull/*"
+  ]
+}
