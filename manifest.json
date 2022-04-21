@@ -1,6 +1,6 @@
 {
   "name": "github-pr-ci-skip",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Adds ci skip to PR title as default.",
   "manifest_version": 3,
   "background": {
