@@ -36,6 +36,7 @@ const appender = () => {
   }
 }
 
+let waiting = true
 const waitTitle = () => {
   console.log("waittitle...")
   const prTitleField = document.getElementById("merge_title_field") as HTMLInputElement | null;
@@ -43,9 +44,14 @@ const waitTitle = () => {
     return setTimeout(waitTitle, 1000)
   } else {
     appender()
+    waiting = false
   }
 }
 
-waitTitle()
-
-window.addEventListener("popstate", waitTitle);
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log(request.url, waiting);
+  if (waiting || !request.url.match(/pull\//)) {
+    return
+  }
+  waitTitle()
+});
