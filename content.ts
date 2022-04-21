@@ -3,31 +3,41 @@ const appender = () => {
   console.log(prTitleField)
 
   if (prTitleField) {
-    const value = prTitleField.value;
-
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.id = "skip_ci_checkbox"
-    checkbox.checked = true;
-    checkbox.onchange = (checked) => {
-      if ((checked.currentTarget as HTMLInputElement).checked) {
-        prTitleField.value = `${value} [ci skip]`
-      } else {
-        prTitleField.value = value.replace(/\[(ci skip|skip ci)+\]/, "")
+    (() => {
+      const maybeCheckboxDom = document.getElementById("skip_ci_checkbox") as HTMLInputElement | null
+      if (maybeCheckboxDom) {
+        maybeCheckboxDom.checked = true
+        return maybeCheckboxDom
       }
-    }
-    checkbox.innerHTML = "append ci skip?"
 
-    prTitleField.parentElement?.appendChild(checkbox)
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.id = "skip_ci_checkbox"
+      checkbox.checked = true;
+      checkbox.onchange = (checked) => {
+        if ((checked.currentTarget as HTMLInputElement).checked) {
+          prTitleField.value = `${prTitleField.value} [ci skip]`
+        } else {
+          prTitleField.value = prTitleField.value.replace(/(\s*)\[(ci skip|skip ci)+\](\s*)/, "")
+        }
+      }
 
-    const alreadyCiSkip = !!(value.match(/ci/) && value.match(/skip/))
+      const label = document.createElement("label");
+      label.innerText = " ci skip toggle "
+      label.appendChild(checkbox)
+
+      prTitleField.parentElement?.appendChild(label)
+    })()
+
+    const alreadyCiSkip = !!(prTitleField.value.match(/ci/) && prTitleField.value.match(/skip/))
     if (!alreadyCiSkip) {
-      prTitleField.value = `${value} [ci skip]`
+      prTitleField.value = `${prTitleField.value} [ci skip]`
     }
   }
 }
 
 const waitTitle = () => {
+  console.log("waittitle...")
   const prTitleField = document.getElementById("merge_title_field") as HTMLInputElement | null;
   if (!prTitleField) {
     return setTimeout(waitTitle, 1000)
@@ -37,3 +47,5 @@ const waitTitle = () => {
 }
 
 waitTitle()
+
+window.addEventListener("popstate", waitTitle);
