@@ -52,8 +52,11 @@ waitTitle()
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log(request.url, waiting);
+  // note: fix for The message port closed before a response was received.
+  sendResponse()
   if (waiting || !request.url.match(/pull\//)) {
-    return
+    return true
   }
   waitTitle()
+  return true
 });

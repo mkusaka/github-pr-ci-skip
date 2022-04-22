@@ -46,9 +46,11 @@
   waitTitle();
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log(request.url, waiting);
+    sendResponse();
     if (waiting || !request.url.match(/pull\//)) {
-      return;
+      return true;
     }
     waitTitle();
+    return true;
   });
 })();
