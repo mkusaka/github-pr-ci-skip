@@ -43,6 +43,7 @@
       waiting = false;
     }
   };
+  waitTitle();
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log(request.url, waiting);
     if (waiting || !request.url.match(/pull\//)) {
