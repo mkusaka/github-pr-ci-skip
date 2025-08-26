@@ -1,274 +1,277 @@
-import { describe, it, expect, vi, beforeEach, afterEach, assert } from 'vitest';
-import { appender, setupObserver, checkAndSetup, cleanupObserver } from '../src/content-logic';
+import { describe, it, expect, vi } from "vitest";
+import { screen, waitFor } from "@testing-library/dom";
+import userEvent from "@testing-library/user-event";
+import {
+  appender,
+  setupObserver,
+  checkAndSetup,
+  cleanupObserver,
+} from "../src/content-logic";
+import { setupGitHubPRPage, createGitHubMergeDialog } from "./test-utils";
 
-describe('Content Script', () => {
-  let mockPrTitleField: HTMLInputElement;
-  let mockCheckbox: HTMLInputElement | null = null;
-  let mockButton: HTMLButtonElement | null = null;
-  
-  beforeEach(() => {
-    // Reset checkbox and button
-    mockCheckbox = null;
-    mockButton = null;
-    
-    // Create mock parent element
-    const parentElement = document.createElement('div');
-    
-    // Create mock PR title field
-    mockPrTitleField = document.createElement('input');
-    mockPrTitleField.type = 'text';
-    mockPrTitleField.value = 'Merge pull request #123 from user/branch';
-    
-    // Append the PR title field to the parent
-    parentElement.appendChild(mockPrTitleField);
-    
-    // Mock querySelector to return the PR title field
-    vi.spyOn(document, 'querySelector').mockImplementation((selector: string) => {
-      if (selector.includes('input[type="text"]')) {
-        return mockPrTitleField;
-      }
-      if (selector.includes('.d-flex.gap-2.mt-3')) {
-        return null;
-      }
-      if (selector.includes('[class*="flex"][class*="gap-2"]')) {
-        return null;
-      }
-      return null;
+describe("Content Script", () => {
+  describe("appender", () => {
+    it("should add [ci skip] to PR title when field exists", () => {
+      const { getCommitInput } = setupGitHubPRPage();
+
+      appender();
+
+      const input = getCommitInput();
+      expect(input).toHaveValue(
+        "[ci skip] Merge pull request #123 from user/branch",
+      );
     });
-    
-    // Mock querySelectorAll for label and button search
-    vi.spyOn(document, 'querySelectorAll').mockImplementation((selector: string) => {
-      if (selector === 'label') {
-        return [] as any;
-      }
-      if (selector === 'button') {
-        return [] as any;
-      }
-      return [] as any;
+
+    it("should create CI Skip button with checkbox", () => {
+      setupGitHubPRPage();
+
+      appender();
+
+      // Check button exists
+      const button = screen.getByRole("button", { name: /CI Skip/i });
+      expect(button).toBeInTheDocument();
+      expect(button).toHaveClass("btn", "btn-sm", "ml-1");
+
+      // Check checkbox exists inside button
+      const checkbox = screen.getByRole("checkbox");
+      expect(checkbox).toBeInTheDocument();
+      expect(checkbox).toBeChecked();
     });
-    
-    // Mock getElementById
-    vi.spyOn(document, 'getElementById').mockImplementation((id: string) => {
-      if (id === 'skip_ci_checkbox') {
-        return mockCheckbox;
-      }
-      return null;
+
+    it("should position CI Skip button after Cancel button", () => {
+      setupGitHubPRPage();
+
+      appender();
+
+      const cancelButton = screen.getByRole("button", { name: "Cancel" });
+      const ciSkipButton = screen.getByRole("button", { name: /CI Skip/i });
+
+      // Check that CI Skip button comes after Cancel button
+      const allButtons = screen.getAllByRole("button");
+      const cancelIndex = allButtons.indexOf(cancelButton);
+      const ciSkipIndex = allButtons.indexOf(ciSkipButton);
+
+      expect(ciSkipIndex).toBeGreaterThan(cancelIndex);
     });
-    
-    // Store original createElement
-    const originalCreateElement = document.createElement.bind(document);
-    
-    // Mock createElement to track element creation
-    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-      const element = originalCreateElement(tagName);
-      if (tagName === 'input' && !mockCheckbox) {
-        // Track the first input element created (which will be our checkbox)
-        mockCheckbox = element as HTMLInputElement;
-      }
-      if (tagName === 'button' && !mockButton) {
-        mockButton = element as HTMLButtonElement;
-      }
-      return element;
+
+    it("should not add [ci skip] if already present", () => {
+      const { getCommitInput } = setupGitHubPRPage({
+        prTitle: "[ci skip] Merge pull request #123 from user/branch",
+      });
+
+      appender();
+
+      const input = getCommitInput();
+      expect(input).toHaveValue(
+        "[ci skip] Merge pull request #123 from user/branch",
+      );
     });
-    
-    // Mock appendChild on the parent
-    vi.spyOn(parentElement, 'appendChild');
-    
-    // Mock console.log to avoid noise in tests
-    vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    it("should not recreate checkbox if it already exists", () => {
+      setupGitHubPRPage();
+
+      // First call creates the checkbox
+      appender();
+      const firstCheckbox = screen.getByRole("checkbox");
+
+      // Second call should not recreate
+      appender();
+      const secondCheckbox = screen.getByRole("checkbox");
+
+      // Should be the same element
+      expect(firstCheckbox).toBe(secondCheckbox);
+      expect(secondCheckbox).toBeChecked();
+    });
+
+    it("should handle checkbox toggle correctly", async () => {
+      const { getCommitInput } = setupGitHubPRPage();
+      const user = userEvent.setup();
+
+      appender();
+
+      const checkbox = screen.getByRole("checkbox");
+      const input = getCommitInput();
+
+      // Initial state - checked with [ci skip]
+      expect(checkbox).toBeChecked();
+      expect(input).toHaveValue(
+        "[ci skip] Merge pull request #123 from user/branch",
+      );
+
+      // Uncheck - removes [ci skip]
+      await user.click(checkbox);
+      expect(checkbox).not.toBeChecked();
+      expect(input).toHaveValue("Merge pull request #123 from user/branch");
+
+      // Check again - adds [ci skip] back
+      await user.click(checkbox);
+      expect(checkbox).toBeChecked();
+      expect(input).toHaveValue(
+        "[ci skip] Merge pull request #123 from user/branch",
+      );
+    });
+
+    it("should handle clicking the button (not checkbox) correctly", async () => {
+      setupGitHubPRPage();
+      const user = userEvent.setup();
+
+      appender();
+
+      const button = screen.getByRole("button", { name: /CI Skip/i });
+      const checkbox = screen.getByRole("checkbox");
+
+      // Initial state
+      expect(checkbox).toBeChecked();
+
+      // Click the button (not the checkbox directly)
+      await user.click(button);
+
+      // Should toggle the checkbox
+      expect(checkbox).not.toBeChecked();
+    });
+
+    it("should work with different selector strategies", () => {
+      // Test with label-based selection
+      createGitHubMergeDialog({ hasLabel: true });
+      appender();
+
+      const input = screen.getByLabelText("Commit message") as HTMLInputElement;
+      expect(input).toHaveValue(
+        "[ci skip] Merge pull request #123 from user/branch",
+      );
+
+      // Clean up for next test
+      document.body.innerHTML = "";
+
+      // Test without label (data-component selector)
+      createGitHubMergeDialog({ hasLabel: false });
+      appender();
+
+      const inputNoLabel = document.querySelector(
+        'input[data-component="input"]',
+      ) as HTMLInputElement;
+      expect(inputNoLabel).toHaveValue(
+        "[ci skip] Merge pull request #123 from user/branch",
+      );
+    });
   });
 
-  afterEach(() => {
-    vi.clearAllMocks();
-    vi.restoreAllMocks();
-    mockCheckbox = null;
-    mockButton = null;
-  });
+  describe("checkAndSetup", () => {
+    it("should call appender when PR title field exists", () => {
+      setupGitHubPRPage();
 
-  describe('appender', () => {
-    it('should add [ci skip] to PR title when field exists', () => {
-      appender();
-      
-      expect(mockPrTitleField.value).toBe('[ci skip] Merge pull request #123 from user/branch');
-    });
-
-    it('should create checkbox toggle when PR title field exists', () => {
-      appender();
-      
-      // The checkbox should be created and have correct properties
-      expect(mockCheckbox).toBeTruthy();
-      expect(mockCheckbox?.type).toBe('checkbox');
-      expect(mockCheckbox?.id).toBe('skip_ci_checkbox');
-      expect(mockCheckbox?.checked).toBe(true);
-    });
-
-    it('should create button with checkbox', () => {
-      appender();
-      
-      expect(mockButton).toBeTruthy();
-      expect(mockButton?.type).toBe('button');
-      expect(mockButton?.className).toBe('btn btn-sm ml-1');
-    });
-
-    it('should not add [ci skip] if already present', () => {
-      mockPrTitleField.value = '[ci skip] Merge pull request #123 from user/branch';
-      
-      appender();
-      
-      expect(mockPrTitleField.value).toBe('[ci skip] Merge pull request #123 from user/branch');
-    });
-
-    it('should not recreate checkbox if it already exists', () => {
-      // Create existing checkbox
-      const existingCheckbox = document.createElement('input');
-      existingCheckbox.type = 'checkbox';
-      existingCheckbox.id = 'skip_ci_checkbox';
-      existingCheckbox.checked = false;
-      mockCheckbox = existingCheckbox;
-      
-      appender();
-      
-      // Should set checked to true
-      expect(existingCheckbox.checked).toBe(true);
-      
-      // Should not create new button
-      expect(mockButton).toBeFalsy();
-    });
-
-    it('should handle checkbox toggle correctly', () => {
-      appender();
-      
-      assert.isNotNull(mockCheckbox);
-      assert.isDefined(mockCheckbox);
-      
-      const checkbox = mockCheckbox;
-      assert.exists(checkbox.onchange);
-      const onchangeHandler = checkbox.onchange;
-      
-      // Test unchecking
-      const event1 = { currentTarget: { checked: false } } as any;
-      onchangeHandler.call(checkbox, event1);
-      expect(mockPrTitleField.value).toBe('Merge pull request #123 from user/branch');
-      
-      // Test checking again
-      const event2 = { currentTarget: { checked: true } } as any;
-      onchangeHandler.call(checkbox, event2);
-      expect(mockPrTitleField.value).toBe('[ci skip] Merge pull request #123 from user/branch');
-    });
-  });
-
-  describe('checkAndSetup', () => {
-    it('should call appender when PR title field exists', () => {
       checkAndSetup();
-      
-      // Check the result of appender being called
-      expect(mockPrTitleField.value).toBe('[ci skip] Merge pull request #123 from user/branch');
+
+      // Verify appender was called by checking its effects
+      const input = screen.getByLabelText("Commit message") as HTMLInputElement;
+      expect(input).toHaveValue(
+        "[ci skip] Merge pull request #123 from user/branch",
+      );
     });
 
-    it('should setup observer when PR title field does not exist', () => {
-      // Make querySelector return null
-      vi.spyOn(document, 'querySelector').mockReturnValue(null);
-      
-      const observeSpy = vi.fn();
-      global.MutationObserver = vi.fn().mockImplementation(() => ({
-        observe: observeSpy,
-        disconnect: vi.fn(),
-      }));
-      
+    it("should setup observer when PR title field does not exist", () => {
+      // Start with empty DOM
+      document.body.innerHTML = "";
+
+      const observeSpy = vi.spyOn(MutationObserver.prototype, "observe");
+
       checkAndSetup();
-      
+
       expect(observeSpy).toHaveBeenCalledWith(document.body, {
         childList: true,
-        subtree: true
+        subtree: true,
       });
+
+      observeSpy.mockRestore();
     });
   });
 
-  describe('setupObserver', () => {
-    beforeEach(() => {
-      global.MutationObserver = vi.fn().mockImplementation((_callback) => ({
-        observe: vi.fn(),
-        disconnect: vi.fn(),
-      }));
-    });
+  describe("setupObserver", () => {
+    it("should observe DOM changes and add CI skip when merge dialog appears", async () => {
+      // Start with empty DOM
+      document.body.innerHTML = '<div id="root"></div>';
 
-    it('should create and configure MutationObserver', () => {
+      // Start observing
       setupObserver();
-      
-      expect(global.MutationObserver).toHaveBeenCalledWith(expect.any(Function));
+
+      // Simulate GitHub dynamically adding the merge dialog
+      const root = document.getElementById("root")!;
+      root.innerHTML = `
+        <label for="commit-msg">Commit message</label>
+        <input id="commit-msg" type="text" value="Merge pull request #123 from user/branch" />
+        <div class="d-flex gap-2 mt-3">
+          <button>Confirm merge</button>
+          <button>Cancel</button>
+        </div>
+      `;
+
+      // Wait for observer to react
+      await waitFor(() => {
+        const checkbox = screen.getByRole("checkbox");
+        expect(checkbox).toBeInTheDocument();
+      });
+
+      // Verify the input was updated
+      const input = screen.getByLabelText("Commit message") as HTMLInputElement;
+      expect(input).toHaveValue(
+        "[ci skip] Merge pull request #123 from user/branch",
+      );
     });
 
-    it('should retry if document.body is not ready', () => {
+    it("should handle document.body not being ready", () => {
       const originalBody = document.body;
-      Object.defineProperty(document, 'body', {
+      Object.defineProperty(document, "body", {
         get: () => null,
         configurable: true,
       });
-      
-      const setTimeoutSpy = vi.spyOn(global, 'setTimeout');
-      
+
+      const setTimeoutSpy = vi.spyOn(global, "setTimeout");
+
       setupObserver();
-      
+
+      // Should retry after 100ms
       expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 100);
-      
-      Object.defineProperty(document, 'body', {
+
+      // Restore
+      Object.defineProperty(document, "body", {
         get: () => originalBody,
         configurable: true,
       });
+      setTimeoutSpy.mockRestore();
     });
 
-    it('should call appender when PR title field appears', () => {
-      let observerCallback: MutationCallback | null = null;
-      
-      global.MutationObserver = vi.fn().mockImplementation((callback) => {
-        observerCallback = callback;
-        return {
-          observe: vi.fn(),
-          disconnect: vi.fn(),
-        };
-      });
-      
-      setupObserver();
-      
-      // Simulate DOM mutation
-      observerCallback!([], {} as MutationObserver);
-      
-      expect(mockPrTitleField.value).toBe('[ci skip] Merge pull request #123 from user/branch');
-    });
+    it("should disconnect existing observer before creating new one", () => {
+      const disconnectSpy = vi.spyOn(MutationObserver.prototype, "disconnect");
 
-    it('should disconnect existing observer before creating new one', () => {
-      const disconnectSpy = vi.fn();
-      global.MutationObserver = vi.fn().mockImplementation(() => ({
-        observe: vi.fn(),
-        disconnect: disconnectSpy,
-      }));
-      
-      // First call to create observer
+      // First call
       setupObserver();
-      
-      // Second call should disconnect first observer
+
+      // Second call should disconnect the first
       setupObserver();
-      
-      expect(disconnectSpy).toHaveBeenCalled();
+
+      expect(disconnectSpy.mock.calls.length).toBeGreaterThanOrEqual(1);
+
+      disconnectSpy.mockRestore();
     });
   });
 
-  describe('cleanupObserver', () => {
-    it('should disconnect observer if it exists', () => {
-      const disconnectSpy = vi.fn();
-      global.MutationObserver = vi.fn().mockImplementation(() => ({
-        observe: vi.fn(),
-        disconnect: disconnectSpy,
-      }));
-      
+  describe("cleanupObserver", () => {
+    it("should disconnect observer if it exists", () => {
+      const disconnectSpy = vi.spyOn(MutationObserver.prototype, "disconnect");
+
+      // Setup an observer first
       setupObserver();
+
+      // Clean it up
       cleanupObserver();
-      
+
       expect(disconnectSpy).toHaveBeenCalled();
+
+      disconnectSpy.mockRestore();
     });
 
-    it('should handle case when observer does not exist', () => {
-      // Should not throw error
+    it("should handle case when observer does not exist", () => {
+      // Should not throw even without an observer
       expect(() => cleanupObserver()).not.toThrow();
     });
   });
