@@ -36,9 +36,6 @@
     "test:run": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit",
-    "lint": "oxlint .",
-    "lint:fix": "oxlint . --fix",
-    "package": "rm -f pacakge.zip && pnpm build && zip -r package.zip . -x '.git/**' './node_modules/**' 'pnpm-lock.yaml' '*.ts' '.idea/**' 'tsconfig.json' 'package.json' '.gitignore'"
+    "package": "rm -f package.zip && pnpm build && zip -r package.zip . -x '.git/**' './node_modules/**' 'pnpm-lock.yaml' '*.ts' '.idea/**' 'tsconfig.json' 'package.json' '.gitignore'"
   }
 }
