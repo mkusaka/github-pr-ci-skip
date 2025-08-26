@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22.18.0'
           cache: 'yarn'
       - name: intall deps
         run: yarn install --check-files
