@@ -4,19 +4,7 @@ const init = () => {
   // Setup on initial load
   checkAndSetup();
 
-  // Handle navigation events
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log(request.url);
-    sendResponse(); // Fix for "The message port closed before a response was received"
-    
-    if (request.url && request.url.match(/pull\//)) {
-      // Re-check when navigating to a PR page
-      checkAndSetup();
-    }
-    return true;
-  });
-
-  // Also listen for GitHub's pjax events for better compatibility
+  // Listen for GitHub's pjax events (SPA navigation)
   document.addEventListener('pjax:end', () => {
     checkAndSetup();
   });
