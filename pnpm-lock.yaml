@@ -13,8 +13,8 @@ importers:
         version: 4.1.5
     devDependencies:
       '@types/chrome':
-        specifier: ^0.0.270
-        version: 0.0.270
+        specifier: ^0.1.4
+        version: 0.1.4
       esbuild:
         specifier: ^0.23.0
         version: 0.23.1
@@ -171,8 +171,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@types/chrome@0.0.270':
-    resolution: {integrity: sha512-ADvkowV7YnJfycZZxL2brluZ6STGW+9oKG37B422UePf2PCXuFA/XdERI0T18wtuWPx0tmFeZqq6MOXVk1IC+Q==}
+  '@types/chrome@0.1.4':
+    resolution: {integrity: sha512-vfISO7SPppN3OKVUqWujtZ4vux3nhDqKaHYEHgfQuPARHuWJ3jjyc1s13H0ckzEc86/neTkCl1TeW72UK6jYKA==}
 
   '@types/filesystem@0.0.36':
     resolution: {integrity: sha512-vPDXOZuannb9FZdxgHnqSwAG/jvdGM8Wq+6N4D/d80z+D4HWH+bItqsZaVRQykAn6WEVeEkLm2oQigyHtgb0RA==}
@@ -783,7 +783,7 @@ snapshots:
   '@esbuild/win32-x64@0.23.1':
     optional: true
 
-  '@types/chrome@0.0.270':
+  '@types/chrome@0.1.4':
     dependencies:
       '@types/filesystem': 0.0.36
       '@types/har-format': 1.2.16
