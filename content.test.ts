@@ -61,15 +61,9 @@ describe('Content Script', () => {
     // Mock createElement to track element creation
     vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
       const element = originalCreateElement(tagName);
-      if (tagName === 'input') {
-        // Track the input element immediately (type will be set later by the code)
-        const input = element as HTMLInputElement;
-        // Store the input temporarily
-        setTimeout(() => {
-          if (input.type === 'checkbox' && !mockCheckbox) {
-            mockCheckbox = input;
-          }
-        }, 0);
+      if (tagName === 'input' && !mockCheckbox) {
+        // Track the first input element created (which will be our checkbox)
+        mockCheckbox = element as HTMLInputElement;
       }
       if (tagName === 'button' && !mockButton) {
         mockButton = element as HTMLButtonElement;
@@ -98,20 +92,14 @@ describe('Content Script', () => {
       expect(mockPrTitleField.value).toBe('[ci skip] Merge pull request #123 from user/branch');
     });
 
-    it.skip('should create checkbox toggle when PR title field exists', async () => {
+    it('should create checkbox toggle when PR title field exists', () => {
       appender();
       
-      // Wait a bit for DOM to update
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
-      // Check if checkbox was created with correct properties
-      const allInputs = document.querySelectorAll('input');
-      const checkbox = Array.from(allInputs).find((el) => el.id === 'skip_ci_checkbox') as HTMLInputElement;
-      
-      expect(checkbox).toBeTruthy();
-      expect(checkbox?.type).toBe('checkbox');
-      expect(checkbox?.id).toBe('skip_ci_checkbox');
-      expect(checkbox?.checked).toBe(true);
+      // The checkbox should be created and have correct properties
+      expect(mockCheckbox).toBeTruthy();
+      expect(mockCheckbox?.type).toBe('checkbox');
+      expect(mockCheckbox?.id).toBe('skip_ci_checkbox');
+      expect(mockCheckbox?.checked).toBe(true);
     });
 
     it('should create button with checkbox', () => {
@@ -147,17 +135,10 @@ describe('Content Script', () => {
       expect(mockButton).toBeFalsy();
     });
 
-    it.skip('should handle checkbox toggle correctly', async () => {
+    it('should handle checkbox toggle correctly', () => {
       appender();
       
-      // Wait a bit for DOM to update
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
-      // Find the checkbox in the DOM
-      const allInputs = document.querySelectorAll('input');
-      const checkbox = Array.from(allInputs).find((el) => el.id === 'skip_ci_checkbox') as HTMLInputElement;
-      
-      const onchangeHandler = checkbox?.onchange;
+      const onchangeHandler = mockCheckbox?.onchange;
       expect(onchangeHandler).toBeTruthy();
       
       // Test unchecking
