@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { appender, checkAndSetup, setupObserver, cleanupObserver } from './content';
+import { appender, setupObserver, checkAndSetup, cleanupObserver } from './content-logic';
 
 describe('Content Script', () => {
   let mockPrTitleField: HTMLInputElement;
