@@ -1,19 +1,15 @@
 {
   "devDependencies": {
-    "@testing-library/dom": "^10.4.1",
+    "@crxjs/vite-plugin": "^2.2.0",
     "@types/chrome": "^0.1.4",
-    "@types/webextension-polyfill": "^0.12.3",
     "@vitest/ui": "^3.2.4",
     "@webext-core/fake-browser": "^1.3.2",
-    "esbuild": "^0.25.9",
     "happy-dom": "^18.0.1",
-    "jsdom": "^26.1.0",
     "oxlint": "^1.13.0",
     "prettier": "^3.6.2",
     "typescript": "^5.9.2",
     "vite": "^7.1.3",
-    "vitest": "^3.2.4",
-    "webextension-polyfill": "^0.12.0"
+    "vitest": "^3.2.4"
   },
   "name": "github-pr-ci-skip",
   "version": "0.0.5",
@@ -22,8 +18,8 @@
   "author": "mkusaka <hinoshita1992@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "esbuild content.ts --bundle --target=chrome100 --outfile=content.js",
-    "watch": "esbuild content.ts --bundle --target=chrome100 --watch --outfile=content.js",
+    "build": "vite build",
+    "dev": "vite build --watch",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint .",
     "lint:fix": "oxlint . --fix",
@@ -32,6 +28,6 @@
     "test:run": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "package": "rm -f package.zip && pnpm build && zip -r package.zip . -x '.git/**' './node_modules/**' 'pnpm-lock.yaml' '*.ts' '.idea/**' 'tsconfig.json' 'package.json' '.gitignore'"
+    "package": "rm -f package.zip && pnpm build && cd dist && zip -r ../package.zip ."
   }
 }

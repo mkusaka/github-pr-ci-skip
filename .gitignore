@@ -107,3 +107,4 @@ dist
 # Build output files
 background.js
 content.js
+package.zip
