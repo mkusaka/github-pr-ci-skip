@@ -103,3 +103,7 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Build output files
+background.js
+content.js
