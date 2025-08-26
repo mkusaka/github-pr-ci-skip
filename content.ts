@@ -1,23 +1,13 @@
 import { checkAndSetup, cleanupObserver } from './content-logic';
 
 const init = () => {
+  console.log('[CI SKIP] Extension initialized, current URL:', window.location.href);
   // Setup on initial load
   checkAndSetup();
 
-  // Handle navigation events
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log(request.url);
-    sendResponse(); // Fix for "The message port closed before a response was received"
-    
-    if (request.url && request.url.match(/pull\//)) {
-      // Re-check when navigating to a PR page
-      checkAndSetup();
-    }
-    return true;
-  });
-
-  // Also listen for GitHub's pjax events for better compatibility
+  // Listen for GitHub's pjax events (SPA navigation)
   document.addEventListener('pjax:end', () => {
+    console.log('[CI SKIP] pjax:end event fired, current URL:', window.location.href);
     checkAndSetup();
   });
 
@@ -29,5 +19,8 @@ const init = () => {
 
 // Only run init if not in test environment
 if (typeof chrome !== 'undefined' && chrome?.runtime) {
+  console.log('[CI SKIP] Chrome runtime detected, initializing extension');
   init();
+} else {
+  console.log('[CI SKIP] Chrome runtime not available, extension not initialized');
 }
