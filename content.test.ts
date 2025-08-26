@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, assert } from 'vitest';
 import { appender, setupObserver, checkAndSetup, cleanupObserver } from './content-logic';
 
 describe('Content Script', () => {
@@ -138,17 +138,21 @@ describe('Content Script', () => {
     it('should handle checkbox toggle correctly', () => {
       appender();
       
-      const onchangeHandler = mockCheckbox?.onchange;
-      expect(onchangeHandler).toBeTruthy();
+      assert.isNotNull(mockCheckbox);
+      assert.isDefined(mockCheckbox);
+      
+      const checkbox = mockCheckbox;
+      assert.exists(checkbox.onchange);
+      const onchangeHandler = checkbox.onchange;
       
       // Test unchecking
       const event1 = { currentTarget: { checked: false } } as any;
-      onchangeHandler!(event1);
+      onchangeHandler.call(checkbox, event1);
       expect(mockPrTitleField.value).toBe('Merge pull request #123 from user/branch');
       
       // Test checking again
       const event2 = { currentTarget: { checked: true } } as any;
-      onchangeHandler!(event2);
+      onchangeHandler.call(checkbox, event2);
       expect(mockPrTitleField.value).toBe('[ci skip] Merge pull request #123 from user/branch');
     });
   });
@@ -182,7 +186,7 @@ describe('Content Script', () => {
 
   describe('setupObserver', () => {
     beforeEach(() => {
-      global.MutationObserver = vi.fn().mockImplementation((callback) => ({
+      global.MutationObserver = vi.fn().mockImplementation((_callback) => ({
         observe: vi.fn(),
         disconnect: vi.fn(),
       }));
