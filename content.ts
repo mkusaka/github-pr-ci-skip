@@ -46,7 +46,7 @@ export const setupObserver = () => {
     observer.disconnect();
   }
 
-  observer = new MutationObserver((mutations) => {
+  observer = new MutationObserver((_mutations) => {
     // Check if the merge_title_field is added to the DOM
     const prTitleField = document.getElementById("merge_title_field");
     if (prTitleField) {

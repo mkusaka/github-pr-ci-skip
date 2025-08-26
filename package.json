@@ -28,6 +28,8 @@
     "watch:background": "esbuild background.ts --bundle --target=chrome100 --watch --outfile=background.js",
     "build:content": "esbuild content.ts --bundle --target=chrome100 --outfile=content.js",
     "watch:content": "esbuild content.ts --bundle --target=chrome100 --watch --outfile=content.js",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
