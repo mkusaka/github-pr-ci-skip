@@ -39,7 +39,7 @@ jobs:
           cp README.md chrome-extension/
           
           cd chrome-extension
-          zip -r ../chrome-extension.zip *
+          zip -r ../chrome-extension.zip -- *
           cd ..
 
       - name: Upload to Chrome Web Store
@@ -57,13 +57,17 @@ jobs:
         if: always()
         run: |
           if [ "${{ job.status }}" == "success" ]; then
-            echo "### ✅ Chrome Web Store Deployment Successful!" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "The extension has been uploaded to Chrome Web Store." >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Note:** The extension will be reviewed by Google before being published." >> $GITHUB_STEP_SUMMARY
+            {
+              echo "### ✅ Chrome Web Store Deployment Successful!"
+              echo ""
+              echo "The extension has been uploaded to Chrome Web Store."
+              echo ""
+              echo "**Note:** The extension will be reviewed by Google before being published."
+            } >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "### ❌ Chrome Web Store Deployment Failed" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Please check the logs for more details." >> $GITHUB_STEP_SUMMARY
+            {
+              echo "### ❌ Chrome Web Store Deployment Failed"
+              echo ""
+              echo "Please check the logs for more details."
+            } >> "$GITHUB_STEP_SUMMARY"
           fi

@@ -38,7 +38,7 @@ jobs:
         id: version
         run: |
           VERSION=$(jq -r '.version' manifest.json)
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "Version: ${VERSION}"
 
       - name: Create release package
@@ -55,7 +55,7 @@ jobs:
           
           # Create zip file
           cd release-package
-          zip -r ../github-pr-ci-skip-v${{ steps.version.outputs.version }}.zip *
+          zip -r ../github-pr-ci-skip-v${{ steps.version.outputs.version }}.zip -- *
           cd ..
           
           # Also create a source code archive
@@ -110,11 +110,13 @@ jobs:
 
       - name: Upload Release Assets Summary
         run: |
-          echo "### 📦 Release Created Successfully!" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Version:** v${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Assets:**" >> $GITHUB_STEP_SUMMARY
-          echo "- \`github-pr-ci-skip-v${{ steps.version.outputs.version }}.zip\` - Chrome Extension package" >> $GITHUB_STEP_SUMMARY
-          echo "- \`github-pr-ci-skip-source-v${{ steps.version.outputs.version }}.zip\` - Source code" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "### 📦 Release Created Successfully!"
+            echo ""
+            echo "**Version:** v${{ steps.version.outputs.version }}"
+            echo "**Tag:** ${{ github.ref_name }}"
+            echo ""
+            echo "**Assets:**"
+            echo "- \`github-pr-ci-skip-v${{ steps.version.outputs.version }}.zip\` - Chrome Extension package"
+            echo "- \`github-pr-ci-skip-source-v${{ steps.version.outputs.version }}.zip\` - Source code"
+          } >> "$GITHUB_STEP_SUMMARY"
