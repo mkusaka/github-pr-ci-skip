@@ -4,7 +4,7 @@ let observer: MutationObserver | null = null;
 const findMergeTitleField = (): HTMLInputElement | null => {
   // First try to find by label text
   const labelElement = Array.from(document.querySelectorAll('label')).find(
-    label => label.textContent?.trim() === 'Commit message'
+    (label: HTMLLabelElement) => label.textContent?.trim() === 'Commit message'
   );
   
   let prTitleField: HTMLInputElement | null = null;
@@ -43,7 +43,7 @@ const findMergeTitleField = (): HTMLInputElement | null => {
           return prTitleField;
         }
       }
-    } catch (e) {
+    } catch {
       // Some selectors might not be valid, ignore errors
     }
   }
@@ -114,7 +114,7 @@ export const appender = () => {
 
     // First, find the Confirm merge button
     const confirmBtn = Array.from(document.querySelectorAll('button')).find(
-      btn => btn.textContent?.trim() === 'Confirm merge'
+      (btn: HTMLButtonElement) => btn.textContent?.trim() === 'Confirm merge'
     );
     
     if (confirmBtn && confirmBtn.parentElement && confirmBtn.parentElement.parentElement) {
@@ -124,15 +124,20 @@ export const appender = () => {
       const mainContainer = loadingWrapper.parentElement;
       
       // Find Cancel button in the main container
-      const cancelButton = Array.from(mainContainer.querySelectorAll('button')).find(
-        btn => btn.textContent?.trim() === 'Cancel'
-      );
-      
-      if (cancelButton) {
-        // Insert CI Skip button after Cancel button
-        cancelButton.parentNode?.insertBefore(button, cancelButton.nextSibling);
+      if (mainContainer) {
+        const cancelButton = Array.from(mainContainer.querySelectorAll('button')).find(
+          (btn: HTMLButtonElement) => btn.textContent?.trim() === 'Cancel'
+        );
+        
+        if (cancelButton) {
+          // Insert CI Skip button after Cancel button
+          cancelButton.parentNode?.insertBefore(button, cancelButton.nextSibling);
+        } else {
+          // Insert after the loading wrapper if Cancel button not found
+          loadingWrapper.parentNode?.insertBefore(button, loadingWrapper.nextSibling);
+        }
       } else {
-        // Insert after the loading wrapper if Cancel button not found
+        // Insert after the loading wrapper if mainContainer is not found
         loadingWrapper.parentNode?.insertBefore(button, loadingWrapper.nextSibling);
       }
     } else {
@@ -172,7 +177,7 @@ export const setupObserver = () => {
     observer.disconnect();
   }
 
-  observer = new MutationObserver((mutations) => {
+  observer = new MutationObserver((_mutations) => {
     // Try to find the merge title field
     const prTitleField = findMergeTitleField();
     
