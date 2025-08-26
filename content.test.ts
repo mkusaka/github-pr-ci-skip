@@ -128,7 +128,7 @@ describe('Content Script', () => {
         value: mockCheckbox,
         writable: false
       });
-      onchangeHandler!(uncheckEvent);
+      onchangeHandler!.call(mockCheckbox!, uncheckEvent);
       
       expect(mockPrTitleField.value).toBe('Test PR');
       
@@ -139,7 +139,7 @@ describe('Content Script', () => {
         value: mockCheckbox,
         writable: false
       });
-      onchangeHandler!(checkEvent);
+      onchangeHandler!.call(mockCheckbox!, checkEvent);
       
       expect(mockPrTitleField.value).toBe('Test PR [ci skip]');
     });
