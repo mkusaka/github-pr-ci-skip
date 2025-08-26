@@ -1,10 +1,15 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite';
+import { crx } from '@crxjs/vite-plugin';
+import manifest from './src/manifest';
 
 export default defineConfig({
+  plugins: [
+    crx({ manifest }),
+  ],
   test: {
     globals: true,
     environment: 'happy-dom',
-    setupFiles: ['./test-setup.ts'],
+    setupFiles: ['./test/test-setup.ts'],
   },
 });
