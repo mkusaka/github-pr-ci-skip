@@ -1,0 +1,13 @@
+# Lock files
+pnpm-lock.yaml
+
+# Build output
+dist/
+build/
+*.crx
+
+# Coverage
+coverage/
+
+# Node modules
+node_modules/
