@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [crx({ manifest })],
   build: {
     sourcemap: true,
+    minify: false,
   },
   test: {
     globals: true,
