@@ -31,8 +31,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build extension
-        run: pnpm build
+      - name: Build and package extension
+        run: pnpm package
 
       - name: Get version from manifest.json
         id: version
@@ -43,20 +43,10 @@ jobs:
 
       - name: Create release package
         run: |
-          # Create a clean directory for packaging
-          mkdir -p release-package
+          # Rename the package.zip created by pnpm package
+          mv package.zip github-pr-ci-skip-v${{ steps.version.outputs.version }}.zip
 
-          # Copy built extension files from dist
-          cp -r dist/* release-package/
-          cp LICENSE release-package/
-          cp README.md release-package/
-
-          # Create zip file
-          cd release-package
-          zip -r ../github-pr-ci-skip-v${{ steps.version.outputs.version }}.zip -- *
-          cd ..
-
-          # Also create a source code archive
+          # Create a source code archive
           zip -r github-pr-ci-skip-source-v${{ steps.version.outputs.version }}.zip . \
             -x "*.git*" \
             -x "*node_modules*" \
