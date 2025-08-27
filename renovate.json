@@ -1,4 +1,4 @@
 {
-  "extends": ["config:base"],
+  "extends": ["config:best-practices"],
   "rangeStrategy": "bump"
 }
