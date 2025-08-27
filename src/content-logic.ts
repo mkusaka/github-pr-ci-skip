@@ -225,7 +225,9 @@ export const setupObserver = () => {
 
 export const checkAndSetup = () => {
   // Only run on GitHub PR pages
-  const isPRPage = window.location.pathname.match(/^\/[^\/]+\/[^\/]+\/pull\/\d+/);
+  const isPRPage = window.location.pathname.match(
+    /^\/[^\/]+\/[^\/]+\/pull\/\d+/,
+  );
   if (!isPRPage) {
     cleanupObserver();
     return;
