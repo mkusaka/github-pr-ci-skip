@@ -37,7 +37,7 @@ jobs:
       - name: Get version from manifest.json
         id: version
         run: |
-          VERSION=$(jq -r '.version' manifest.json)
+          VERSION=$(jq -r '.version' dist/manifest.json)
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "Version: ${VERSION}"
 
@@ -46,10 +46,8 @@ jobs:
           # Create a clean directory for packaging
           mkdir -p release-package
 
-          # Copy necessary files
-          cp manifest.json release-package/
-          cp background.js release-package/
-          cp content.js release-package/
+          # Copy built extension files from dist
+          cp -r dist/* release-package/
           cp LICENSE release-package/
           cp README.md release-package/
 
