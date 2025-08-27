@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { screen, waitFor } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
 import {
@@ -157,7 +157,15 @@ describe("Content Script", () => {
   });
 
   describe("checkAndSetup", () => {
-    it("should call appender when PR title field exists", () => {
+    beforeEach(() => {
+      // Mock window.location.pathname to be a PR page
+      Object.defineProperty(window, "location", {
+        writable: true,
+        value: { pathname: "/owner/repo/pull/123" },
+      });
+    });
+
+    it("should call appender when PR title field exists on PR page", () => {
       setupGitHubPRPage();
 
       checkAndSetup();
@@ -169,7 +177,7 @@ describe("Content Script", () => {
       );
     });
 
-    it("should setup observer when PR title field does not exist", () => {
+    it("should setup observer when PR title field does not exist on PR page", () => {
       // Start with empty DOM
       document.body.innerHTML = "";
 
@@ -181,6 +189,27 @@ describe("Content Script", () => {
         childList: true,
         subtree: true,
       });
+
+      observeSpy.mockRestore();
+    });
+
+    it("should not setup observer on non-PR pages", () => {
+      // Mock non-PR page
+      Object.defineProperty(window, "location", {
+        writable: true,
+        value: { pathname: "/owner/repo/issues/123" },
+      });
+
+      setupGitHubPRPage();
+      const observeSpy = vi.spyOn(MutationObserver.prototype, "observe");
+
+      checkAndSetup();
+
+      expect(observeSpy).not.toHaveBeenCalled();
+
+      // Verify appender was not called
+      const input = screen.getByLabelText("Commit message") as HTMLInputElement;
+      expect(input).toHaveValue("Merge pull request #123 from user/branch");
 
       observeSpy.mockRestore();
     });
