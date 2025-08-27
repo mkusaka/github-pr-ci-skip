@@ -5,6 +5,9 @@ import manifest from "./src/manifest";
 
 export default defineConfig({
   plugins: [crx({ manifest })],
+  build: {
+    sourcemap: true,
+  },
   test: {
     globals: true,
     environment: "happy-dom",
