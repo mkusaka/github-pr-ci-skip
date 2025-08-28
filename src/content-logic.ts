@@ -228,10 +228,6 @@ export const checkAndSetup = () => {
   const currentPath = window.location.pathname;
   const isPRPage = currentPath.match(/^\/[^\/]+\/[^\/]+\/pull\/\d+/);
 
-  console.log(
-    `[GitHub PR CI Skip] checkAndSetup called - Path: ${currentPath}, isPR: ${!!isPRPage}`,
-  );
-
   if (!isPRPage) {
     // Clean up any existing observers and elements when not on PR page
     cleanupObserver();
@@ -247,10 +243,8 @@ export const checkAndSetup = () => {
   const prTitleField = findMergeTitleField();
 
   if (prTitleField) {
-    console.log("[GitHub PR CI Skip] Merge dialog found immediately");
     appender();
   } else {
-    console.log("[GitHub PR CI Skip] Setting up observer for merge dialog");
     // Always set up observer on PR pages, even if it already exists
     setupObserver();
   }

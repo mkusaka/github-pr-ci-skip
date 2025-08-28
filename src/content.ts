@@ -10,9 +10,6 @@ const init = () => {
   const handleNavigation = () => {
     const currentPath = window.location.pathname;
     if (currentPath !== lastPath) {
-      console.log(
-        `[GitHub PR CI Skip] Navigation detected: ${lastPath} -> ${currentPath}`,
-      );
       lastPath = currentPath;
       checkAndSetup();
     }
