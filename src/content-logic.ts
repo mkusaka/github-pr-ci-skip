@@ -225,19 +225,32 @@ export const setupObserver = () => {
 
 export const checkAndSetup = () => {
   // Only run on GitHub PR pages
-  const isPRPage = window.location.pathname.match(
-    /^\/[^\/]+\/[^\/]+\/pull\/\d+/,
-  );
+  const currentPath = window.location.pathname;
+  const isPRPage = currentPath.match(/^\/[^\/]+\/[^\/]+\/pull\/\d+/);
+
+  // Debug logging
+  console.log("[GitHub PR CI Skip] Current path:", currentPath);
+  console.log("[GitHub PR CI Skip] Is PR page:", !!isPRPage);
+
   if (!isPRPage) {
+    console.log("[GitHub PR CI Skip] Not a PR page, cleaning up observer");
     cleanupObserver();
     return;
   }
 
+  console.log("[GitHub PR CI Skip] PR page detected, setting up CI skip");
+
   const prTitleField = findMergeTitleField();
 
   if (prTitleField) {
+    console.log(
+      "[GitHub PR CI Skip] Merge dialog found, adding CI skip checkbox",
+    );
     appender();
   } else {
+    console.log(
+      "[GitHub PR CI Skip] Merge dialog not found, setting up observer",
+    );
     setupObserver();
   }
 };
