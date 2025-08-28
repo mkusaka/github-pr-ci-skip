@@ -15,7 +15,7 @@
     "vitest": "3.2.4"
   },
   "name": "github-pr-ci-skip",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "main": "index.js",
   "repository": "https://github.com/mkusaka/github-pr-ci-skip.git",
   "author": "mkusaka <hinoshita1992@gmail.com>",
