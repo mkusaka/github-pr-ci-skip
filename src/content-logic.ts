@@ -225,19 +225,33 @@ export const setupObserver = () => {
 
 export const checkAndSetup = () => {
   // Only run on GitHub PR pages
-  const isPRPage = window.location.pathname.match(
-    /^\/[^\/]+\/[^\/]+\/pull\/\d+/,
+  const currentPath = window.location.pathname;
+  const isPRPage = currentPath.match(/^\/[^\/]+\/[^\/]+\/pull\/\d+/);
+
+  console.log(
+    `[GitHub PR CI Skip] checkAndSetup called - Path: ${currentPath}, isPR: ${!!isPRPage}`,
   );
+
   if (!isPRPage) {
+    // Clean up any existing observers and elements when not on PR page
     cleanupObserver();
+    // Remove any existing CI skip checkbox
+    const existingCheckbox = document.getElementById("skip_ci_checkbox");
+    if (existingCheckbox) {
+      existingCheckbox.closest("button")?.remove();
+    }
     return;
   }
 
+  // We're on a PR page, ensure observer is active
   const prTitleField = findMergeTitleField();
 
   if (prTitleField) {
+    console.log("[GitHub PR CI Skip] Merge dialog found immediately");
     appender();
   } else {
+    console.log("[GitHub PR CI Skip] Setting up observer for merge dialog");
+    // Always set up observer on PR pages, even if it already exists
     setupObserver();
   }
 };
