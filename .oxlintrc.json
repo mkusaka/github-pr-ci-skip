@@ -6,18 +6,10 @@
   "globals": {
     "chrome": "readonly"
   },
-  "ignorePatterns": [
-    "dist/",
-    "coverage/",
-    "package.zip"
-  ],
+  "ignorePatterns": ["dist/", "coverage/", "package.zip"],
   "overrides": [
     {
-      "files": [
-        "test/**/*",
-        "**/*.test.*",
-        "**/*.spec.*"
-      ],
+      "files": ["test/**/*", "**/*.test.*", "**/*.spec.*"],
       "env": {
         "jest": true,
         "node": true
