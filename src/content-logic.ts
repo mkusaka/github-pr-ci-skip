@@ -288,7 +288,7 @@ export const setupObserver = () => {
 export const checkAndSetup = () => {
   // Only run on GitHub PR pages
   const currentPath = window.location.pathname;
-  const isPRPage = currentPath.match(/^\/[^\/]+\/[^\/]+\/pull\/\d+/);
+  const isPRPage = currentPath.match(/^\/[^/]+\/[^/]+\/pull\/\d+/);
 
   if (!isPRPage) {
     // Clean up any existing observers and elements when not on PR page

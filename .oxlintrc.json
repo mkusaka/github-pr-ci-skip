@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "env": {
+    "browser": true
+  },
+  "globals": {
+    "chrome": "readonly"
+  },
+  "ignorePatterns": ["dist/", "coverage/", "package.zip"],
+  "overrides": [
+    {
+      "files": ["test/**/*", "**/*.test.*", "**/*.spec.*"],
+      "env": {
+        "jest": true,
+        "node": true
+      }
+    }
+  ]
+}
