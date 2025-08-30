@@ -1,34 +1,44 @@
 let observer: MutationObserver | null = null;
 
 // Ensure React-controlled inputs pick up programmatic value changes
-const setInputValueAndDispatch = (el: HTMLInputElement, value: string) => {
+const setInputValueAndDispatch = (
+  el: HTMLInputElement | HTMLTextAreaElement,
+  value: string,
+) => {
   try {
+    // Prefer prototype setter to notify React's value tracker
     const proto = Object.getPrototypeOf(el);
-    const valueSetter = Object.getOwnPropertyDescriptor(proto, "value")?.set;
-    if (valueSetter) {
-      valueSetter.call(el, value);
-    } else {
-      // Fallback
-      (el as HTMLInputElement).value = value;
-    }
+    const desc = Object.getOwnPropertyDescriptor(proto, "value");
+    const valueSetter = desc?.set as ((v: string) => void) | undefined;
+    if (valueSetter) valueSetter.call(el, value);
+    else (el as HTMLInputElement | HTMLTextAreaElement).value = value;
   } catch {
-    // Last-resort fallback
-    (el as HTMLInputElement).value = value;
+    (el as HTMLInputElement | HTMLTextAreaElement).value = value;
   }
 
-  // Dispatch events that React listens to
-  el.dispatchEvent(new Event("input", { bubbles: true }));
+  // Focus to simulate real user edit and place caret at end
+  el.focus();
+  try {
+    const len = (el as HTMLInputElement | HTMLTextAreaElement).value.length;
+    (el as HTMLInputElement | HTMLTextAreaElement).setSelectionRange?.(len, len);
+  } catch {}
+
+  // Dispatch events React listens to
+  const InputEvt = (globalThis as any).InputEvent || Event;
+  el.dispatchEvent(new InputEvent ? new InputEvent("input", { bubbles: true, inputType: "insertText", data: value }) : new Event("input", { bubbles: true }));
   el.dispatchEvent(new Event("change", { bubbles: true }));
+  // Blur to ensure any onBlur handlers run
+  (el as HTMLElement).blur();
 };
 
 // Helper function to find the merge title field using various selectors
-const findMergeTitleField = (): HTMLInputElement | null => {
+const findMergeTitleField = (): (HTMLInputElement | HTMLTextAreaElement) | null => {
   // First try to find by label text
   const labelElement = Array.from(document.querySelectorAll("label")).find(
     (label: HTMLLabelElement) => label.textContent?.trim() === "Commit message",
   );
 
-  let prTitleField: HTMLInputElement | null = null;
+  let prTitleField: HTMLInputElement | HTMLTextAreaElement | null = null;
 
   if (labelElement) {
     // Try to find the input using the label's 'for' attribute
@@ -47,19 +57,27 @@ const findMergeTitleField = (): HTMLInputElement | null => {
   const selectors = [
     // GitHub UI selectors (using stable attributes)
     'input[data-component="input"]',
+    'textarea[data-component="input"]',
     'input[type="text"][value*="Merge pull request"]',
+    'textarea[placeholder*="Merge pull request"]',
 
     // Look for text input in a form control container that's likely the merge dialog
     '.bgColor-muted input[type="text"]:first-of-type',
+    '.bgColor-muted textarea:first-of-type',
     'div[data-has-label] input[type="text"]:first-of-type',
+    'div[data-has-label] textarea:first-of-type',
+
+    // Name-based guesses
+    'input[name*="commit"][name*="title"]',
+    'textarea[name*="commit"][name*="title"]',
   ];
 
   for (const selector of selectors) {
     try {
       prTitleField = document.querySelector(
         selector,
-      ) as HTMLInputElement | null;
-      if (prTitleField && prTitleField.type === "text") {
+      ) as HTMLInputElement | HTMLTextAreaElement | null;
+      if (prTitleField && (prTitleField as HTMLInputElement).type ? (prTitleField as HTMLInputElement).type === "text" : true) {
         // Validate it's likely the commit message field by checking its value
         if (
           prTitleField.value?.includes("Merge pull request") ||
