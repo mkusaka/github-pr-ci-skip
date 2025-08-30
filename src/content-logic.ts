@@ -1,13 +1,65 @@
 let observer: MutationObserver | null = null;
 
+// Ensure React-controlled inputs pick up programmatic value changes
+const setInputValueAndDispatch = (
+  el: HTMLInputElement | HTMLTextAreaElement,
+  value: string,
+) => {
+  try {
+    // Prefer prototype setter to notify React's value tracker
+    const proto = Object.getPrototypeOf(el);
+    const desc = Object.getOwnPropertyDescriptor(proto, "value");
+    const valueSetter = desc?.set as ((v: string) => void) | undefined;
+    if (valueSetter) valueSetter.call(el, value);
+    else (el as HTMLInputElement | HTMLTextAreaElement).value = value;
+  } catch {
+    (el as HTMLInputElement | HTMLTextAreaElement).value = value;
+  }
+
+  // Focus to simulate real user edit and place caret at end
+  el.focus();
+  try {
+    const len = (el as HTMLInputElement | HTMLTextAreaElement).value.length;
+    (el as HTMLInputElement | HTMLTextAreaElement).setSelectionRange?.(
+      len,
+      len,
+    );
+  } catch {}
+
+  // Dispatch events React listens to
+  // Use InputEvent if available, otherwise fall back to a plain Event('input').
+  try {
+    // Avoid calling the constructor without required args; always pass type
+    const InputEventCtor = (globalThis as any).InputEvent as any;
+    if (typeof InputEventCtor === "function") {
+      el.dispatchEvent(
+        new InputEventCtor("input", {
+          bubbles: true,
+          inputType: "insertText",
+          data: value,
+        }),
+      );
+    } else {
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  } catch {
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+  el.dispatchEvent(new Event("change", { bubbles: true }));
+  // Blur to ensure any onBlur handlers run
+  (el as HTMLElement).blur();
+};
+
 // Helper function to find the merge title field using various selectors
-const findMergeTitleField = (): HTMLInputElement | null => {
+const findMergeTitleField = ():
+  | (HTMLInputElement | HTMLTextAreaElement)
+  | null => {
   // First try to find by label text
   const labelElement = Array.from(document.querySelectorAll("label")).find(
     (label: HTMLLabelElement) => label.textContent?.trim() === "Commit message",
   );
 
-  let prTitleField: HTMLInputElement | null = null;
+  let prTitleField: HTMLInputElement | HTMLTextAreaElement | null = null;
 
   if (labelElement) {
     // Try to find the input using the label's 'for' attribute
@@ -26,28 +78,37 @@ const findMergeTitleField = (): HTMLInputElement | null => {
   const selectors = [
     // GitHub UI selectors (using stable attributes)
     'input[data-component="input"]',
+    'textarea[data-component="input"]',
     'input[type="text"][value*="Merge pull request"]',
+    'textarea[placeholder*="Merge pull request"]',
 
     // Look for text input in a form control container that's likely the merge dialog
     '.bgColor-muted input[type="text"]:first-of-type',
+    ".bgColor-muted textarea:first-of-type",
     'div[data-has-label] input[type="text"]:first-of-type',
+    "div[data-has-label] textarea:first-of-type",
+
+    // Name-based guesses
+    'input[name*="commit"][name*="title"]',
+    'textarea[name*="commit"][name*="title"]',
   ];
 
   for (const selector of selectors) {
     try {
-      prTitleField = document.querySelector(
-        selector,
-      ) as HTMLInputElement | null;
-      if (prTitleField && prTitleField.type === "text") {
-        // Validate it's likely the commit message field by checking its value
-        if (
-          prTitleField.value?.includes("Merge pull request") ||
-          prTitleField.value?.includes("Merge branch") ||
-          prTitleField.closest(".bgColor-muted") ||
-          prTitleField.closest("div[data-has-label]")
-        ) {
-          return prTitleField;
-        }
+      const el = document.querySelector(selector) as
+        | HTMLInputElement
+        | HTMLTextAreaElement
+        | null;
+      if (!el) continue;
+      const val = el.value || "";
+      // Validate it's likely the commit message field by checking its value or container
+      if (
+        val.includes("Merge pull request") ||
+        val.includes("Merge branch") ||
+        el.closest(".bgColor-muted") ||
+        el.closest("div[data-has-label]")
+      ) {
+        return el;
       }
     } catch {
       // Some selectors might not be valid, ignore errors
@@ -82,12 +143,13 @@ export const appender = () => {
           .replace(/^\[ci skip\]\s*|\[skip ci\]\s*/gi, "")
           .trim();
         // Add [ci skip] at the beginning
-        prTitleField.value = `[ci skip] ${cleanedValue}`;
+        setInputValueAndDispatch(prTitleField, `[ci skip] ${cleanedValue}`);
       } else {
         // Remove [ci skip] or [skip ci] from the beginning
-        prTitleField.value = prTitleField.value
+        const next = prTitleField.value
           .replace(/^\[ci skip\]\s*|\[skip ci\]\s*/gi, "")
           .trim();
+        setInputValueAndDispatch(prTitleField, next);
       }
     };
 
@@ -187,7 +249,7 @@ export const appender = () => {
     // Add [ci skip] at the beginning if not already present
     const alreadyCiSkip = /^\[ci skip\]|^\[skip ci\]/i.test(prTitleField.value);
     if (!alreadyCiSkip) {
-      prTitleField.value = `[ci skip] ${prTitleField.value}`;
+      setInputValueAndDispatch(prTitleField, `[ci skip] ${prTitleField.value}`);
     }
   }
 };
