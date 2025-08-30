@@ -20,7 +20,10 @@ const setInputValueAndDispatch = (
   el.focus();
   try {
     const len = (el as HTMLInputElement | HTMLTextAreaElement).value.length;
-    (el as HTMLInputElement | HTMLTextAreaElement).setSelectionRange?.(len, len);
+    (el as HTMLInputElement | HTMLTextAreaElement).setSelectionRange?.(
+      len,
+      len,
+    );
   } catch {}
 
   // Dispatch events React listens to
@@ -48,7 +51,9 @@ const setInputValueAndDispatch = (
 };
 
 // Helper function to find the merge title field using various selectors
-const findMergeTitleField = (): (HTMLInputElement | HTMLTextAreaElement) | null => {
+const findMergeTitleField = ():
+  | (HTMLInputElement | HTMLTextAreaElement)
+  | null => {
   // First try to find by label text
   const labelElement = Array.from(document.querySelectorAll("label")).find(
     (label: HTMLLabelElement) => label.textContent?.trim() === "Commit message",
@@ -79,9 +84,9 @@ const findMergeTitleField = (): (HTMLInputElement | HTMLTextAreaElement) | null 
 
     // Look for text input in a form control container that's likely the merge dialog
     '.bgColor-muted input[type="text"]:first-of-type',
-    '.bgColor-muted textarea:first-of-type',
+    ".bgColor-muted textarea:first-of-type",
     'div[data-has-label] input[type="text"]:first-of-type',
-    'div[data-has-label] textarea:first-of-type',
+    "div[data-has-label] textarea:first-of-type",
 
     // Name-based guesses
     'input[name*="commit"][name*="title"]',

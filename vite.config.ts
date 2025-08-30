@@ -21,6 +21,15 @@ const vitestEnvShim = (): Plugin => ({
 export default defineConfig(({ mode }) => ({
   // In test mode, avoid CRX plugin and inject env shim
   plugins: mode === "test" ? [vitestEnvShim()] : [crx({ manifest })],
+  resolve: {
+    alias:
+      mode === "test"
+        ? {
+            "/@vite/env": new URL("./test/shims/vite-env.ts", import.meta.url)
+              .pathname,
+          }
+        : {},
+  },
   build: {
     sourcemap: true,
     minify: false,
