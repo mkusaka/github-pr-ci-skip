@@ -24,8 +24,18 @@ const setInputValueAndDispatch = (
   } catch {}
 
   // Dispatch events React listens to
-  const InputEvt = (globalThis as any).InputEvent || Event;
-  el.dispatchEvent(new InputEvent ? new InputEvent("input", { bubbles: true, inputType: "insertText", data: value }) : new Event("input", { bubbles: true }));
+  // Use InputEvent if available, otherwise fall back to a plain Event('input').
+  try {
+    // Avoid calling the constructor without required args; always pass type
+    const IE = (globalThis as any).InputEvent as any;
+    if (typeof IE === "function") {
+      el.dispatchEvent(new IE("input", { bubbles: true, inputType: "insertText", data: value }));
+    } else {
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  } catch {
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+  }
   el.dispatchEvent(new Event("change", { bubbles: true }));
   // Blur to ensure any onBlur handlers run
   (el as HTMLElement).blur();
@@ -228,22 +238,6 @@ export const appender = () => {
     const alreadyCiSkip = /^\[ci skip\]|^\[skip ci\]/i.test(prTitleField.value);
     if (!alreadyCiSkip) {
       setInputValueAndDispatch(prTitleField, `[ci skip] ${prTitleField.value}`);
-    }
-
-    // Safety net: enforce prefix right before submit (covers any UI variants)
-    const form = prTitleField.closest("form");
-    if (form && !form.dataset.ciSkipPatched) {
-      form.dataset.ciSkipPatched = "true";
-      form.addEventListener(
-        "submit",
-        () => {
-          const field = findMergeTitleField();
-          if (field && !/^\[ci skip\]|^\[skip ci\]/i.test(field.value)) {
-            setInputValueAndDispatch(field, `[ci skip] ${field.value}`);
-          }
-        },
-        { capture: true },
-      );
     }
   }
 };
