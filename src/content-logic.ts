@@ -1,5 +1,26 @@
 let observer: MutationObserver | null = null;
 
+// Ensure React-controlled inputs pick up programmatic value changes
+const setInputValueAndDispatch = (el: HTMLInputElement, value: string) => {
+  try {
+    const proto = Object.getPrototypeOf(el);
+    const valueSetter = Object.getOwnPropertyDescriptor(proto, "value")?.set;
+    if (valueSetter) {
+      valueSetter.call(el, value);
+    } else {
+      // Fallback
+      (el as HTMLInputElement).value = value;
+    }
+  } catch {
+    // Last-resort fallback
+    (el as HTMLInputElement).value = value;
+  }
+
+  // Dispatch events that React listens to
+  el.dispatchEvent(new Event("input", { bubbles: true }));
+  el.dispatchEvent(new Event("change", { bubbles: true }));
+};
+
 // Helper function to find the merge title field using various selectors
 const findMergeTitleField = (): HTMLInputElement | null => {
   // First try to find by label text
@@ -82,12 +103,13 @@ export const appender = () => {
           .replace(/^\[ci skip\]\s*|\[skip ci\]\s*/gi, "")
           .trim();
         // Add [ci skip] at the beginning
-        prTitleField.value = `[ci skip] ${cleanedValue}`;
+        setInputValueAndDispatch(prTitleField, `[ci skip] ${cleanedValue}`);
       } else {
         // Remove [ci skip] or [skip ci] from the beginning
-        prTitleField.value = prTitleField.value
+        const next = prTitleField.value
           .replace(/^\[ci skip\]\s*|\[skip ci\]\s*/gi, "")
           .trim();
+        setInputValueAndDispatch(prTitleField, next);
       }
     };
 
@@ -187,7 +209,7 @@ export const appender = () => {
     // Add [ci skip] at the beginning if not already present
     const alreadyCiSkip = /^\[ci skip\]|^\[skip ci\]/i.test(prTitleField.value);
     if (!alreadyCiSkip) {
-      prTitleField.value = `[ci skip] ${prTitleField.value}`;
+      setInputValueAndDispatch(prTitleField, `[ci skip] ${prTitleField.value}`);
     }
   }
 };
