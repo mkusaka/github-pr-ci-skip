@@ -229,6 +229,22 @@ export const appender = () => {
     if (!alreadyCiSkip) {
       setInputValueAndDispatch(prTitleField, `[ci skip] ${prTitleField.value}`);
     }
+
+    // Safety net: enforce prefix right before submit (covers any UI variants)
+    const form = prTitleField.closest("form");
+    if (form && !form.dataset.ciSkipPatched) {
+      form.dataset.ciSkipPatched = "true";
+      form.addEventListener(
+        "submit",
+        () => {
+          const field = findMergeTitleField();
+          if (field && !/^\[ci skip\]|^\[skip ci\]/i.test(field.value)) {
+            setInputValueAndDispatch(field, `[ci skip] ${field.value}`);
+          }
+        },
+        { capture: true },
+      );
+    }
   }
 };
 
