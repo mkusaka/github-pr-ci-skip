@@ -27,9 +27,15 @@ const setInputValueAndDispatch = (
   // Use InputEvent if available, otherwise fall back to a plain Event('input').
   try {
     // Avoid calling the constructor without required args; always pass type
-    const IE = (globalThis as any).InputEvent as any;
-    if (typeof IE === "function") {
-      el.dispatchEvent(new IE("input", { bubbles: true, inputType: "insertText", data: value }));
+    const InputEventCtor = (globalThis as any).InputEvent as any;
+    if (typeof InputEventCtor === "function") {
+      el.dispatchEvent(
+        new InputEventCtor("input", {
+          bubbles: true,
+          inputType: "insertText",
+          data: value,
+        }),
+      );
     } else {
       el.dispatchEvent(new Event("input", { bubbles: true }));
     }
@@ -84,19 +90,20 @@ const findMergeTitleField = (): (HTMLInputElement | HTMLTextAreaElement) | null 
 
   for (const selector of selectors) {
     try {
-      prTitleField = document.querySelector(
-        selector,
-      ) as HTMLInputElement | HTMLTextAreaElement | null;
-      if (prTitleField && (prTitleField as HTMLInputElement).type ? (prTitleField as HTMLInputElement).type === "text" : true) {
-        // Validate it's likely the commit message field by checking its value
-        if (
-          prTitleField.value?.includes("Merge pull request") ||
-          prTitleField.value?.includes("Merge branch") ||
-          prTitleField.closest(".bgColor-muted") ||
-          prTitleField.closest("div[data-has-label]")
-        ) {
-          return prTitleField;
-        }
+      const el = document.querySelector(selector) as
+        | HTMLInputElement
+        | HTMLTextAreaElement
+        | null;
+      if (!el) continue;
+      const val = el.value || "";
+      // Validate it's likely the commit message field by checking its value or container
+      if (
+        val.includes("Merge pull request") ||
+        val.includes("Merge branch") ||
+        el.closest(".bgColor-muted") ||
+        el.closest("div[data-has-label]")
+      ) {
+        return el;
       }
     } catch {
       // Some selectors might not be valid, ignore errors
