@@ -80,7 +80,20 @@ describe("Content Script", () => {
 
       // Should be the same element
       expect(firstCheckbox).toBe(secondCheckbox);
-      expect(secondCheckbox).toBeChecked();
+    });
+
+    it("should preserve checkbox state when appender is called again", () => {
+      setupGitHubPRPage();
+
+      appender();
+      const checkbox = screen.getByRole("checkbox") as HTMLInputElement;
+
+      // Uncheck the checkbox
+      checkbox.checked = false;
+
+      // Re-running appender should NOT force it back to checked
+      appender();
+      expect(checkbox).not.toBeChecked();
     });
 
     it("should handle checkbox toggle correctly", async () => {

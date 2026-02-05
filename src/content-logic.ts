@@ -127,7 +127,6 @@ export const appender = () => {
       "skip_ci_checkbox",
     ) as HTMLInputElement | null;
     if (maybeCheckboxDom) {
-      maybeCheckboxDom.checked = true;
       return;
     }
 
