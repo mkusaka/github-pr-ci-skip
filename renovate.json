@@ -1,9 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:best-practices",
-    "group:definitelyTyped"
-  ],
+  "extends": ["config:best-practices", "group:definitelyTyped"],
   "packageRules": [
     {
       "description": "Group minor and patch updates for production dependencies",
