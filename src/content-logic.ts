@@ -187,8 +187,15 @@ export const appender = () => {
     };
 
     // First, find the Confirm merge button
+    // Match variations: "Confirm merge", "Confirm squash and merge",
+    // "Confirm rebase and merge", "Confirm bypass rules and merge", etc.
     const confirmBtn = Array.from(document.querySelectorAll("button")).find(
-      (btn: HTMLButtonElement) => btn.textContent?.trim() === "Confirm merge",
+      (btn: HTMLButtonElement) => {
+        const text = btn.textContent?.trim() || "";
+        return (
+          text.startsWith("Confirm") && text.toLowerCase().includes("merge")
+        );
+      },
     );
 
     if (
@@ -233,6 +240,7 @@ export const appender = () => {
       // Fallback: try to find any flex container with buttons
       const buttonContainer =
         document.querySelector(".d-flex.gap-2.mt-3") ||
+        document.querySelector(".d-flex.gap-2.pr-mt-3") ||
         document.querySelector('[class*="flex"][class*="gap-2"]');
 
       if (buttonContainer) {
