@@ -30,20 +30,20 @@ pnpm install
 
 ### Commands
 
-| Command | Description |
-| --- | --- |
-| `pnpm dev` | Build in watch mode |
-| `pnpm build` | Production build (outputs to `dist/`) |
-| `pnpm test` | Run tests (vitest, watch mode) |
-| `pnpm test:run` | Run tests once |
-| `pnpm test:ui` | Run tests with Vitest UI |
-| `pnpm test:coverage` | Run tests with coverage |
-| `pnpm typecheck` | TypeScript type check |
-| `pnpm lint` | Lint with oxlint |
-| `pnpm lint:fix` | Lint with auto-fix |
-| `pnpm format` | Format with Prettier |
-| `pnpm format:check` | Check formatting |
-| `pnpm package` | Generate `package.zip` for Chrome Web Store |
+| Command              | Description                                 |
+| -------------------- | ------------------------------------------- |
+| `pnpm dev`           | Build in watch mode                         |
+| `pnpm build`         | Production build (outputs to `dist/`)       |
+| `pnpm test`          | Run tests (vitest, watch mode)              |
+| `pnpm test:run`      | Run tests once                              |
+| `pnpm test:ui`       | Run tests with Vitest UI                    |
+| `pnpm test:coverage` | Run tests with coverage                     |
+| `pnpm typecheck`     | TypeScript type check                       |
+| `pnpm lint`          | Lint with oxlint                            |
+| `pnpm lint:fix`      | Lint with auto-fix                          |
+| `pnpm format`        | Format with Prettier                        |
+| `pnpm format:check`  | Check formatting                            |
+| `pnpm package`       | Generate `package.zip` for Chrome Web Store |
 
 ### Load unpacked extension
 
