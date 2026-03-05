@@ -169,6 +169,7 @@ export const appender = () => {
 
     // Use form-checkbox with margin reset
     checkbox.className = "form-checkbox my-0"; // my-0 removes vertical margin
+    checkbox.style.width = "auto"; // prevent inherited width (e.g. 72ch from Refined GitHub)
 
     // Assemble the button structure
     container.appendChild(labelText);
