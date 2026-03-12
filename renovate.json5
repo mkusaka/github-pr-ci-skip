@@ -1,0 +1,36 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:best-practices", "group:definitelyTyped"],
+  packageRules: [
+    {
+      description: "Group minor and patch updates for production dependencies",
+      groupName: "dependencies (non-major)",
+      matchManagers: ["npm"],
+      matchDepTypes: ["dependencies"],
+      matchUpdateTypes: ["minor", "patch"],
+      automerge: true,
+      automergeType: "pr",
+      minimumReleaseAge: "7 days",
+    },
+    {
+      description: "Group minor and patch updates for dev dependencies",
+      groupSlug: "dev-dependencies-non-major",
+      groupName: "devDependencies (non-major)",
+      matchManagers: ["npm"],
+      matchDepTypes: ["devDependencies"],
+      matchUpdateTypes: ["minor", "patch"],
+      automerge: true,
+      automergeType: "pr",
+      minimumReleaseAge: "7 days",
+    },
+    {
+      description: "Group minor, patch, and digest updates for GitHub Actions",
+      groupName: "github-actions (non-major)",
+      matchManagers: ["github-actions"],
+      matchUpdateTypes: ["minor", "patch", "digest", "pinDigest"],
+      automerge: true,
+      automergeType: "pr",
+      minimumReleaseAge: "7 days",
+    },
+  ],
+}
