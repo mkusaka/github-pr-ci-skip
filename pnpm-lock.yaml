@@ -30,8 +30,8 @@ importers:
         specifier: 1.3.4
         version: 1.3.4
       happy-dom:
-        specifier: 20.8.3
-        version: 20.8.3
+        specifier: 20.8.4
+        version: 20.8.4
       oxlint:
         specifier: 1.55.0
         version: 1.55.0
@@ -46,7 +46,7 @@ importers:
         version: 8.0.0(@types/node@25.3.5)(esbuild@0.27.3)
       vitest:
         specifier: 4.1.0
-        version: 4.1.0(@types/node@25.3.5)(@vitest/ui@4.1.0)(happy-dom@20.8.3)(vite@8.0.0(@types/node@25.3.5)(esbuild@0.27.3))
+        version: 4.1.0(@types/node@25.3.5)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(vite@8.0.0(@types/node@25.3.5)(esbuild@0.27.3))
 
 packages:
 
@@ -754,8 +754,8 @@ packages:
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
-  happy-dom@20.8.3:
-    resolution: {integrity: sha512-lMHQRRwIPyJ70HV0kkFT7jH/gXzSI7yDkQFe07E2flwmNDFoWUTRMKpW2sglsnpeA7b6S2TJPp98EbQxai8eaQ==}
+  happy-dom@20.8.4:
+    resolution: {integrity: sha512-GKhjq4OQCYB4VLFBzv8mmccUadwlAusOZOI7hC1D9xDIT5HhzkJK17c4el2f6R6C715P9xB4uiMxeKUa2nHMwQ==}
     engines: {node: '>=20.0.0'}
 
   htmlparser2@10.1.0:
@@ -1536,7 +1536,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vitest: 4.1.0(@types/node@25.3.5)(@vitest/ui@4.1.0)(happy-dom@20.8.3)(vite@8.0.0(@types/node@25.3.5)(esbuild@0.27.3))
+      vitest: 4.1.0(@types/node@25.3.5)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(vite@8.0.0(@types/node@25.3.5)(esbuild@0.27.3))
 
   '@vitest/utils@4.1.0':
     dependencies:
@@ -1737,7 +1737,7 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
-  happy-dom@20.8.3:
+  happy-dom@20.8.4:
     dependencies:
       '@types/node': 25.3.5
       '@types/whatwg-mimetype': 3.0.2
@@ -2021,7 +2021,7 @@ snapshots:
       esbuild: 0.27.3
       fsevents: 2.3.3
 
-  vitest@4.1.0(@types/node@25.3.5)(@vitest/ui@4.1.0)(happy-dom@20.8.3)(vite@8.0.0(@types/node@25.3.5)(esbuild@0.27.3)):
+  vitest@4.1.0(@types/node@25.3.5)(@vitest/ui@4.1.0)(happy-dom@20.8.4)(vite@8.0.0(@types/node@25.3.5)(esbuild@0.27.3)):
     dependencies:
       '@vitest/expect': 4.1.0
       '@vitest/mocker': 4.1.0(vite@8.0.0(@types/node@25.3.5)(esbuild@0.27.3))
@@ -2046,7 +2046,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 25.3.5
       '@vitest/ui': 4.1.0(vitest@4.1.0)
-      happy-dom: 20.8.3
+      happy-dom: 20.8.4
     transitivePeerDependencies:
       - msw
 
