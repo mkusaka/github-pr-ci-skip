@@ -35,10 +35,5 @@
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
     "package": "rm -f package.zip && pnpm build && cd dist && zip -r ../package.zip ."
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
   }
 }
