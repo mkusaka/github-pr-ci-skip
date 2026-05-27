@@ -27,8 +27,8 @@ importers:
         specifier: 4.1.7
         version: 4.1.7(vitest@4.1.7)
       '@webext-core/fake-browser':
-        specifier: 1.4.1
-        version: 1.4.1
+        specifier: 1.5.0
+        version: 1.5.0
       happy-dom:
         specifier: 20.9.0
         version: 20.9.0
@@ -423,8 +423,8 @@ packages:
   '@webcomponents/custom-elements@1.6.0':
     resolution: {integrity: sha512-CqTpxOlUCPWRNUPZDxT5v2NnHXA4oox612iUGnmTUGQFhZ1Gkj8kirtl/2wcF6MqX7+PqqicZzOCBKKfIn0dww==}
 
-  '@webext-core/fake-browser@1.4.1':
-    resolution: {integrity: sha512-1tHhmG59FM4GQz7HskEYpqbcKvX4AlUMvAig3Q6j9WNTXm2kpDTzz84H9381o/7L8XfJuq4AqxTXhGsRl5Zuig==}
+  '@webext-core/fake-browser@1.5.0':
+    resolution: {integrity: sha512-dq5LWtr3XjB9B9LSgEZo4JUEmwBGAxa5CHbn7CvCC2jf4SOG0iBD20QSD3dpvcHBXTIHCVbB4bsDVFzlXMnYww==}
 
   acorn-walk@8.3.5:
     resolution: {integrity: sha512-HEHNfbars9v4pgpW6SO1KSPkfoS0xVOM/9UzkJltjlsHZmJasxg8aXkuZa7SMf8vKGIBhpUsPluQSqhJFCqebw==}
@@ -1281,7 +1281,7 @@ snapshots:
 
   '@webcomponents/custom-elements@1.6.0': {}
 
-  '@webext-core/fake-browser@1.4.1':
+  '@webext-core/fake-browser@1.5.0':
     dependencies:
       '@types/webextension-polyfill': 0.10.7
       lodash.merge: 4.6.2
