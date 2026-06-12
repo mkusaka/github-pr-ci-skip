@@ -4,7 +4,7 @@
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/user-event": "14.6.1",
-    "@types/chrome": "0.1.42",
+    "@types/chrome": "0.1.43",
     "@vitest/ui": "4.1.8",
     "@webext-core/fake-browser": "1.5.2",
     "happy-dom": "20.10.1",
