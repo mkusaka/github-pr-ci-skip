@@ -30,8 +30,8 @@ importers:
         specifier: 1.5.2
         version: 1.5.2
       happy-dom:
-        specifier: 20.10.1
-        version: 20.10.1
+        specifier: 20.10.2
+        version: 20.10.2
       oxlint:
         specifier: 1.68.0
         version: 1.68.0
@@ -46,7 +46,7 @@ importers:
         version: 8.0.16(@types/node@25.7.0)
       vitest:
         specifier: 4.1.8
-        version: 4.1.8(@types/node@25.7.0)(@vitest/ui@4.1.8)(happy-dom@20.10.1)(vite@8.0.16(@types/node@25.7.0))
+        version: 4.1.8(@types/node@25.7.0)(@vitest/ui@4.1.8)(happy-dom@20.10.2)(vite@8.0.16(@types/node@25.7.0))
 
 packages:
 
@@ -587,8 +587,8 @@ packages:
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
-  happy-dom@20.10.1:
-    resolution: {integrity: sha512-awPoqPjx8CgjapJllyDlgzgVHjBExcitKK5ZJkxwhQJyQpHFkyS2bEcqCm7IeW20cQvuCI0cz2Ifq79CJKqtiw==}
+  happy-dom@20.10.2:
+    resolution: {integrity: sha512-5p9Sxis3eowDJKqx90QCsgbNA02XXqJ59NOHvD4V6cxp+rP4d/xOyVx7uY3hS8hiUbY1VeiFH8lbJ81AyuDVLQ==}
     engines: {node: '>=20.0.0'}
 
   he@1.2.0:
@@ -969,8 +969,8 @@ packages:
     engines: {node: '>=8'}
     hasBin: true
 
-  ws@8.20.1:
-    resolution: {integrity: sha512-It4dO0K5v//JtTXuPkfEOaI3uUN87iYPnqo/ZzqCoG3g8uhA66QUMs/SrM0YK7/NAu+r4LMh/9dq2A7k+rHs+w==}
+  ws@8.21.0:
+    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -1282,7 +1282,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vitest: 4.1.8(@types/node@25.7.0)(@vitest/ui@4.1.8)(happy-dom@20.10.1)(vite@8.0.16(@types/node@25.7.0))
+      vitest: 4.1.8(@types/node@25.7.0)(@vitest/ui@4.1.8)(happy-dom@20.10.2)(vite@8.0.16(@types/node@25.7.0))
 
   '@vitest/utils@4.1.8':
     dependencies:
@@ -1428,7 +1428,7 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
-  happy-dom@20.10.1:
+  happy-dom@20.10.2:
     dependencies:
       '@types/node': 25.7.0
       '@types/whatwg-mimetype': 3.0.2
@@ -1436,7 +1436,7 @@ snapshots:
       buffer-image-size: 0.6.4
       entities: 7.0.1
       whatwg-mimetype: 3.0.0
-      ws: 8.20.1
+      ws: 8.21.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -1695,7 +1695,7 @@ snapshots:
       '@types/node': 25.7.0
       fsevents: 2.3.3
 
-  vitest@4.1.8(@types/node@25.7.0)(@vitest/ui@4.1.8)(happy-dom@20.10.1)(vite@8.0.16(@types/node@25.7.0)):
+  vitest@4.1.8(@types/node@25.7.0)(@vitest/ui@4.1.8)(happy-dom@20.10.2)(vite@8.0.16(@types/node@25.7.0)):
     dependencies:
       '@vitest/expect': 4.1.8
       '@vitest/mocker': 4.1.8(vite@8.0.16(@types/node@25.7.0))
@@ -1720,7 +1720,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 25.7.0
       '@vitest/ui': 4.1.8(vitest@4.1.8)
-      happy-dom: 20.10.1
+      happy-dom: 20.10.2
     transitivePeerDependencies:
       - msw
 
@@ -1731,4 +1731,4 @@ snapshots:
       siginfo: 2.0.0
       stackback: 0.0.2
 
-  ws@8.20.1: {}
+  ws@8.21.0: {}
