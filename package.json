@@ -1,18 +1,18 @@
 {
   "devDependencies": {
-    "@crxjs/vite-plugin": "2.4.0",
+    "@crxjs/vite-plugin": "2.7.0",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/user-event": "14.6.1",
-    "@types/chrome": "0.1.43",
-    "@vitest/ui": "4.1.8",
+    "@types/chrome": "0.2.0",
+    "@vitest/ui": "4.1.9",
     "@webext-core/fake-browser": "1.5.2",
-    "happy-dom": "20.10.2",
-    "oxlint": "1.68.0",
-    "prettier": "3.8.3",
+    "happy-dom": "20.10.6",
+    "oxlint": "1.71.0",
+    "prettier": "3.8.4",
     "typescript": "6.0.3",
-    "vite": "8.0.16",
-    "vitest": "4.1.8"
+    "vite": "8.1.0",
+    "vitest": "4.1.9"
   },
   "name": "github-pr-ci-skip",
   "version": "0.0.16",
