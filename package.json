@@ -6,7 +6,7 @@
     "@testing-library/user-event": "14.6.1",
     "@types/chrome": "0.1.43",
     "@vitest/ui": "4.1.8",
-    "@webext-core/fake-browser": "1.5.2",
+    "@webext-core/fake-browser": "2.0.1",
     "happy-dom": "20.10.2",
     "oxlint": "1.68.0",
     "prettier": "3.8.3",
