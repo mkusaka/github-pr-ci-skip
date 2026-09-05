@@ -36,5 +36,5 @@
     "test:coverage": "vitest run --coverage",
     "package": "rm -f package.zip && pnpm build && cd dist && zip -r ../package.zip ."
   },
-  "packageManager": "pnpm@11.25.0"
+  "packageManager": "pnpm@12.3.0"
 }
