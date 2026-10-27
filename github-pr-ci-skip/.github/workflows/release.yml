@@ -1,0 +1,113 @@
+name: Release
+on:
+  push:
+    tags:
+      - "v*"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions: {}
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24.22.0"
+          package-manager-cache: false
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build and package extension
+        run: pnpm package
+      - name: Get version from manifest.json
+        id: version
+        run: |
+          VERSION=$(jq -r '.version' dist/manifest.json)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Version: ${VERSION}"
+      - name: Create release package
+        run: |
+          # Rename the package.zip created by pnpm package
+          mv package.zip github-pr-ci-skip-v${{ steps.version.outputs.version }}.zip
+
+          # Create a source code archive
+          zip -r github-pr-ci-skip-source-v${{ steps.version.outputs.version }}.zip . \
+            -x "*.git*" \
+            -x "*node_modules*" \
+            -x "*release-package*" \
+            -x "*.zip"
+      - name: Generate release notes
+        id: release_notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TARGET: ${{ github.sha }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          # Get the previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "No previous tag found, generating notes from beginning"
+            NOTES=$(gh api \
+              --method POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "/repos/${REPOSITORY}/releases/generate-notes" \
+              -f tag_name="$RELEASE_TAG" \
+              -f target_commitish="$RELEASE_TARGET" | jq -r '.body')
+          else
+            echo "Generating notes from ${PREVIOUS_TAG} to ${RELEASE_TAG}"
+            NOTES=$(gh api \
+              --method POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "/repos/${REPOSITORY}/releases/generate-notes" \
+              -f tag_name="$RELEASE_TAG" \
+              -f target_commitish="$RELEASE_TARGET" \
+              -f previous_tag_name="${PREVIOUS_TAG}" | jq -r '.body')
+          fi
+
+          # Save notes to file for the release
+          echo "${NOTES}" > release_notes.md
+          echo "Release notes generated successfully"
+        shell: bash
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh release create "$RELEASE_TAG" \
+            --title "Release $RELEASE_TAG" \
+            --notes-file release_notes.md \
+            "github-pr-ci-skip-v${RELEASE_VERSION}.zip" \
+            "github-pr-ci-skip-source-v${RELEASE_VERSION}.zip"
+      - name: Upload Release Assets Summary
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          {
+            echo "### Release Created Successfully!"
+            echo ""
+            echo "**Version:** v${RELEASE_VERSION}"
+            echo "**Tag:** ${RELEASE_TAG}"
+            echo ""
+            echo "**Assets:**"
+            echo "- \`github-pr-ci-skip-v${RELEASE_VERSION}.zip\` - Chrome Extension package"
+            echo "- \`github-pr-ci-skip-source-v${RELEASE_VERSION}.zip\` - Source code"
+          } >> "$GITHUB_STEP_SUMMARY"
+    permissions:
+      contents: write
+    timeout-minutes: 90
